@@ -12,9 +12,8 @@ def main():
         for model in d[manufacturer]:
             mod = Model(model,
                         d[manufacturer][model]["Description"],
-                        d[manufacturer][model]["Pic"],
-                        man.id)
-            db.session.add(mod)
+                        d[manufacturer][model]["Pic"])
+            man.models.append(mod)
         db.session.commit()
 
 if __name__ == "__main__":

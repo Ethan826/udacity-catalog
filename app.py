@@ -1,6 +1,5 @@
-from flask import Flask, render_template, url_for
-from flask_sqlalchemy import SQLAlchemy
-from db import Manufacturer, Model
+from flask import Flask, render_template
+from db import Manufacturer
 
 app = Flask(__name__)
 
@@ -16,7 +15,7 @@ def manufacturerlist():
 @app.route("/manufacturers/<int:manufacturer_id>/")
 def manufacturerPage(manufacturer_id):
     manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
-    # Problem defining models
+    models = manufacturer.models.query.filter_by(manufacturer_id=manufacturer.id)
     return render_template("manufacturerpage.html",
                            manufacturer=manufacturer,
                            models=models)
@@ -25,7 +24,7 @@ def manufacturerPage(manufacturer_id):
 @app.route("/manufacturers/<int:manufacturer_id>/<int:model_id>/")
 def modelPage(manufacturer_id, model_id):
     manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
-    model = manufacturer.models # This is the problem
+    model = manufacturer.models.query.filter_by(id=model_id).one()
     return render_template("modelpage.html",
                            manufacturer=manufacturer,
                            model=model)
@@ -33,4 +32,4 @@ def modelPage(manufacturer_id, model_id):
 
 if __name__ == "__main__":
     app.debug = True
-    app.run(host="0.0.0.0")
+    app.run()
