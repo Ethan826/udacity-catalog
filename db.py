@@ -6,7 +6,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///catalog.db'
 db = SQLAlchemy(app)
 
 
-class Category(db.Model):
+class Manufacturer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
 
@@ -14,17 +14,19 @@ class Category(db.Model):
         self.name = name
 
 
-class Item(db.Model):
+class Model(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
     description = db.Column(db.Text, nullable=False)
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
-    category = db.relationship('Category', backref=db.backref('items'))
+    picUrl = db.Column(db.Text)
+    category_id = db.Column(db.Integer, db.ForeignKey('manufacturer.id'))
+    category = db.relationship('Manufacturer', backref=db.backref('models'))
 
-    def __init__(self, name, description, category):
+    def __init__(self, name, description, picUrl, category_id):
         self.name = name
         self.description = description
-        self.category_id = category
+        self.picUrl = picUrl
+        self.category_id = category_id
 
 
 if __name__ == "__main__":

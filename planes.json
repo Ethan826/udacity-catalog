@@ -1,0 +1,39 @@
+{
+    "Airbus":
+    {
+        "A300": {"Description": "Two-engine widebody, launched in 1972.",
+                 "Pic": "http://cdn-www.airliners.net/aviation-photos/middle/0/4/4/1102440.jpg"},
+        "A310": {"Description": "Two-engine widebody, launched in 1982.",
+                 "Pic": "http://cdn-www.airliners.net/aviation-photos/middle/0/6/6/1247660.jpg"},
+        "A320": {"Description": "Two-engine narrowbody, launched in 1987. Family also includes the A318, A319, and A321.",
+                 "Pic": "http://cdn-www.airliners.net/aviation-photos/middle/2/5/2/1040252.jpg"},
+        "A330": {"Description": "Two-engine widebody, launched in 1992.",
+                 "Pic": "http://cdn-www.airliners.net/aviation-photos/middle/8/0/2/0905208.jpg"},
+        "A340": {"Description": "Four-engine widebody, launched in 1991.",
+                 "Pic": "http://cdn-www.airliners.net/aviation-photos/middle/6/8/2/0231286.jpg"},
+        "A350": {"Description": "Two-engine narrowbody, launched in 2013.",
+                 "Pic": "http://cdn-www.airliners.net/aviation-photos/middle/5/7/9/2271975.jpg"},
+        "A380": {"Description": "Four-engine widebody, launched in 2005. World’s largest airliner.",
+                 "Pic": "http://cdn-www.airliners.net/aviation-photos/middle/8/4/9/0825948.jpg"}
+    },
+    "Boeing": {
+        "707": {"Description": "Four-engine widebody, launched in 1957.",
+                "Pic": "http://cdn-www.airliners.net/aviation-photos/middle/8/6/8/0541868.jpg"},
+        "717": {"Description": "Two-engine narrowbody, launched as the MD-95 in 1998.",
+                "Pic": "http://cdn-www.airliners.net/aviation-photos/middle/7/3/5/1052537.jpg"},
+        "727": {"Description": "Three-engine narrowbody, launched in 1963.",
+                "Pic": "http://cdn-www.airliners.net/aviation-photos/middle/1/4/4/1232441.jpg"},
+        "737": {"Description": "Two-engine narrowbody, launched in 1967. The best-selling commercial airliner in history.",
+                "Pic": "http://cdn-www.airliners.net/aviation-photos/middle/1/3/7/1087731.jpg"},
+        "747": {"Description": "Four-engine widebody, launched in 1969.",
+                "Pic": "http://cdn-www.airliners.net/aviation-photos/middle/4/2/7/1252724.jpg"},
+        "757": {"Description": "Two-engine narrowbody, launched in 1982.",
+                "Pic": "http://cdn-www.airliners.net/aviation-photos/middle/8/8/6/1139688.jpg"},
+        "767": {"Description": "Two-engine widebody, launched in 1981.",
+                "Pic": "http://cdn-www.airliners.net/aviation-photos/middle/1/5/0/1026051.jpg"},
+        "777": {"Description": "Two-engine widebody, launched in 1994.",
+                "Pic": "http://cdn-www.airliners.net/aviation-photos/middle/0/0/1/1000100.jpg"},
+        "787": {"Description": "Two-engine widebody, launched in 2009.",
+                "Pic": "http://cdn-www.airliners.net/aviation-photos/middle/5/4/1/1626145.jpg"}
+    }
+}
