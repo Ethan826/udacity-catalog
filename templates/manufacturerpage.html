@@ -1,19 +1,20 @@
-{% extends "bootstrap/base.html" -%}
+{% extends "base.html" -%}
 {% block title -%}{{manufacturer.name}} Models{% endblock title -%}
+{% block navbar -%}
+        <li class="active"><a href="#">{{manufacturer.name}}</a></li>
+        <li><a href="{{url_for('manufacturerList')}}">Back to manufacturers</a></li>
+        <li><a href="{{url_for('editManufacturerPage', manufacturer_id=manufacturer.id)}}">Edit</a></li>
+        <li><a href="{{url_for('deleteManufacturerPage', manufacturer_id=manufacturer.id)}}">Delete</a></li>
+{% endblock navbar -%}
 {% block content -%}
-<div class="container">
-    <h1>{{manufacturer.name}}</h1>
-    <ul>
-        {% for model in models %}
-        <li>
-            <a href="{{url_for('modelPage', manufacturer_id=manufacturer.id, model_id=model.id)}}">{{model.name}}</a>
-        </li>
-        {% endfor %}
-    </ul>
-    <p>
-        <a href="{{url_for('editManufacturerPage', manufacturer_id=manufacturer.id)}}">Edit</a> |
-        <a href="{}">Delete</a>
-    </p>
-    <p><a href="{{url_for('manufacturerlist')}}">Back to manufacturers</a></p>
-</div>
+<h1>{{manufacturer.name}}</h1>
+<dl>
+    {% for model in models %}
+    <dt>
+        <a href="{{url_for('modelPage', manufacturer_id=manufacturer.id, model_id=model.id)}}">{{model.name}}</a>
+    </dt>
+    <dd>
+        {{ model.description }}
+    </dd>
+    {% endfor %}
 {% endblock content -%}

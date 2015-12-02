@@ -1,5 +1,9 @@
-.flash {
-    list-style-type: none;
-    background: #f88;
+.caution {
+    color: white;
     padding: 0.5em;
+    background-color: red;
+}
+.caution:hover {
+    color: red;
+    background-color: white;
 }

@@ -1,7 +1,10 @@
-{% extends "bootstrap/base.html" -%}
+{% extends "base.html" -%}
 {% block title -%}{{manufacturer.name}} Models{% endblock title -%}
+{% block navbar %}
+<li class="active"><a href="#">Editing {{manufacturer.name}}</a></li>
+<li><a href="{{url_for('manufacturerList')}}">Back to manufacturers</a></li>
+{% endblock navbar %}
 {% block content -%}
-<div class="container">
     <h1>Edit {{manufacturer.name}}</h1>
 
 
@@ -24,7 +27,4 @@
 
         <input type="submit" value="Submit">
     </form>
-
-    <p><a href="{{url_for('manufacturerlist')}}">Back to manufacturers</a></p>
-</div>
 {% endblock content -%}

@@ -1,0 +1,15 @@
+{% extends "base.html" %} {% block navbar %}
+<li class="active"><a href="#">Deleting {{manufacturer.name}}</a></li>
+<li><a href="{{url_for('manufacturerPage', manufacturer_id=manufacturer.id)}}">Back to {{manufacturer.name}}</a></li>
+{% endblock navbar %} {% block content -%}
+<h1>Caution!</h1>
+<p>Do you really want to delete {{manufacturer.name}}?</p>
+<a href="{{url_for('executeDeleteManufacturer', manufacturer_id=manufacturer.id)}}"><h2><span class="caution">Delete {{manufacturer.name}}.</span></h2></a>
+<br>
+<p>Doing so will also delete the following models:</p>
+<ul class="list-inline">
+    {% for model in models %}
+    <li>{{ model.name }}</li>
+    {% endfor %}
+</ul>
+{% endblock content -%}

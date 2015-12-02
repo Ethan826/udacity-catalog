@@ -13,7 +13,7 @@ Bootstrap(app)
 
 
 @app.route("/")
-def manufacturerlist():
+def manufacturerList():
     manufacturers = Manufacturer.query.all()
     return render_template("manufacturerlist.html",
                            manufacturers=manufacturers)
@@ -87,6 +87,26 @@ def editModelPage(manufacturer_id, model_id):
                                     model_id=model.id))
     else:
         raise RuntimeError
+
+
+@app.route("/<int:manufacturer_id>/delete/")
+def deleteManufacturerPage(manufacturer_id):
+    manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
+    models = manufacturer.models.query.filter_by(
+        manufacturer_id=manufacturer.id)  # How do we order_by here?
+    if request.method == 'GET':
+        return render_template('confirmmanufacturerdelete.html',
+                               manufacturer=manufacturer,
+                               models=models,
+                               approved=False)
+
+
+@app.route("/<int:manufacturer_id>/delete/execute/")
+def executeDeleteManufacturer(manufacturer_id):
+    manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
+    db.session.delete(manufacturer)
+    db.session.commit()
+    return redirect(url_for('manufacturerList'))
 
 
 class ManufacturerEditForm(Form):

@@ -1,14 +1,17 @@
-{% extends "bootstrap/base.html" -%}
+{% extends "base.html" -%}
 {% block title -%}Civil Airplane Catalog{% endblock title -%}
+{% block navbar -%}
+        <li class="active"><a href="#">Manufacturers</a></li>
+{% endblock navbar -%}
 {% block content -%}
 <div class="container">
     <h1>Airplane Manufacturers</h1>
-    <ul>
+    <dl>
         {% for manufacturer in manufacturers %} 
-        <li>
+        <ul class="list-unstyled">
             <a href="{{url_for('manufacturerPage', manufacturer_id=manufacturer.id)}}">{{manufacturer.name}}</a>
-        </li>
+        </ul>
         {% endfor %}
-    </ul>
+    </dl>
 </div>
 {% endblock content -%}
