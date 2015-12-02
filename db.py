@@ -19,8 +19,10 @@ class Model(db.Model):
     name = db.Column(db.Text, nullable=False)
     description = db.Column(db.Text, nullable=False)
     picUrl = db.Column(db.Text)
-    category_id = db.Column(db.Integer, db.ForeignKey('manufacturer.id'))
-    category = db.relationship('Manufacturer', backref=db.backref('models'))
+    manufacturer_id = db.Column(db.Integer, db.ForeignKey('manufacturer.id'))
+    category = db.relationship('Manufacturer',
+                               backref=db.backref('models',
+                                                  uselist=False))
 
     def __init__(self, name, description, picUrl, category_id):
         self.name = name
