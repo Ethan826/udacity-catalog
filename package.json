@@ -1,0 +1,25 @@
+{
+  "name": "catalog",
+  "version": "1.0.0",
+  "description": "Catalog of civil airplanes",
+  "main": "./js/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ethan826/udacity-catalog.git"
+  },
+  "keywords": [
+    "airplanes"
+  ],
+  "author": "Ethan Kent",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ethan826/udacity-catalog/issues"
+  },
+  "homepage": "https://github.com/Ethan826/udacity-catalog#readme",
+  "dependencies": {
+    "jquery": "^2.1.4"
+  }
+}

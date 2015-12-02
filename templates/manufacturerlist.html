@@ -1,20 +1,12 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8"/>
-        <title>Udacity Catalog</title>
-    </head>
-    <body>
-        <div class="container">
-            <h1>Airplane Manufacturers</h1>
-            <ul>
-                {% for manufacturer in manufacturers %} 
-                <li>
-                    <a href="{{url_for('manufacturerPage', manufacturer_id=manufacturer.id)}}">{{manufacturer.name}}</a>
-                </li>
-                {% endfor %}
-
-            </ul>
-        </div>
-    </body>
-</html>
+{% extends "base.html" -%}
+{% block title -%}Civil Airplane Catalog{% endblock title -%}
+{% block content -%}
+<h1>Airplane Manufacturers</h1>
+<ul>
+  {% for manufacturer in manufacturers %} 
+  <li>
+    <a href="{{url_for('manufacturerPage', manufacturer_id=manufacturer.id)}}">{{manufacturer.name}}</a>
+  </li>
+  {% endfor %}
+</ul>
+{% endblock content -%}

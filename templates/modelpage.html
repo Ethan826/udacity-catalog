@@ -1,17 +1,10 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8"/>
-        <title>{{manufacturer.name}} {{model.name}}</title>
-    </head>
-    <body>
-        <div class="container">
-            <h1><a href="{{url_for('manufacturerPage', manufacturer_id=manufacturer.id)}}">{{manufacturer.name}}</a></h1>
-            <h3>Model name: {{model.name}}</h3>
-            <p>{{model.description}}</p>
-            <img width='400' src="{{model.picUrl}}">
-            <br><br>
-            <p><a href="{{url_for('manufacturerlist')}}">Back to manufacturers</a></p>
-        </div>
-    </body>
-</html>
+{% extends "base.html" %}
+{% block title -%}{{manufacturer.name}} {{model.name}}{% endblock title -%}
+{% block content -%}
+<h1><a href="{{url_for('manufacturerPage', manufacturer_id=manufacturer.id)}}">{{manufacturer.name}}</a></h1>
+<h3>Model name: {{model.name}}</h3>
+<p>{{model.description}}</p>
+<img width='400' src="{{model.picUrl}}">
+<br><br>
+<p><a href="{{url_for('manufacturerlist')}}">Back to manufacturers</a></p>
+{% endblock -%}

@@ -1,33 +1,59 @@
-from flask import Flask, render_template
-from db import Manufacturer
+from flask import Flask, render_template, request, redirect, url_for
+from database.db import Manufacturer, db
+from flask_wtf import Form
+from wtforms import StringField
+from wtforms.validators import DataRequired
 
 app = Flask(__name__)
+app.config['WTF_CSRF_ENABLED'] = True
+app.config['SECRET_KEY'] = 'qRdXDN##DjcWUfvE@@J#e^nlu%LpoB!qS9Y9Z17IAwgu&cn2A4'
 
 
 @app.route("/")
-@app.route("/manufacturers/")
 def manufacturerlist():
     manufacturers = Manufacturer.query.all()
     return render_template("manufacturerlist.html",
                            manufacturers=manufacturers)
 
 
-@app.route("/manufacturers/<int:manufacturer_id>/")
+@app.route("/<int:manufacturer_id>/")
 def manufacturerPage(manufacturer_id):
     manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
-    models = manufacturer.models.query.filter_by(manufacturer_id=manufacturer.id)
+    models = manufacturer.models.query.filter_by(
+        manufacturer_id=manufacturer.id)
     return render_template("manufacturerpage.html",
                            manufacturer=manufacturer,
                            models=models)
 
 
-@app.route("/manufacturers/<int:manufacturer_id>/<int:model_id>/")
+@app.route("/<int:manufacturer_id>/<int:model_id>/")
 def modelPage(manufacturer_id, model_id):
     manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
     model = manufacturer.models.query.filter_by(id=model_id).one()
     return render_template("modelpage.html",
                            manufacturer=manufacturer,
                            model=model)
+
+
+@app.route("/<int:manufacturer_id>/edit/", methods=['GET', 'POST'])
+def editManufacturerPage(manufacturer_id):
+    manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
+    if request.method == 'GET':
+        form = EditManufacturerForm()
+        return render_template("editmanufacturerpage.html",
+                               manufacturer=manufacturer,
+                               form=form)
+    elif request.method == 'POST':
+        manufacturer.name = request.form['name']
+        db.session.commit()
+        return redirect(url_for('manufacturerPage',
+                                manufacturer_id=manufacturer.id))
+    else:
+        raise RuntimeError
+
+
+class EditManufacturerForm(Form):
+    name = StringField('name', validators=[DataRequired()])
 
 
 if __name__ == "__main__":
