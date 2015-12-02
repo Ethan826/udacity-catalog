@@ -1,10 +1,9 @@
 {% extends "base.html" -%}
-{% block title -%}{{manufacturer.name}} Models{% endblock title -%}
+{% block title -%}{{manufacturer.name}} {{model.name}}{% endblock title -%}
 {% block content -%}
-<h1>Edit {{manufacturer.name}}</h1>
+<h1>Edit {{manufacturer.name}} {{model.name}}</h1>
 
-
-<form method='post' action='' name='manufacturer-name'>
+<form method='post' action='' name='model-name'>
     <p>
         Enter the new name:<br>
         {{ form.name(size=20) }}<br>
@@ -24,5 +23,9 @@
     <input type="submit" value="Submit">
 </form>
 
-<p><a href="{{url_for('manufacturerlist')}}">Back to manufacturers</a></p>
+<p>
+    <a href="{{url_for('modelPage', manufacturer_id=manufacturer.id, model_id=model.id)}}">
+        Back to manufacturers
+    </a>
+</p>
 {% endblock content -%}
