@@ -1,13 +1,15 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_bootstrap import Bootstrap
 from database.db import Manufacturer, db
 from flask_wtf import Form, CsrfProtect
-from wtforms import StringField
+from wtforms import StringField, TextAreaField
 from wtforms.validators import DataRequired
 
 app = Flask(__name__)
 app.config['WTF_CSRF_ENABLED'] = True
 app.config['SECRET_KEY'] = 'qRdXDN##DjcWUfvE@@J#e^nlu%LpoB!qS9Y9Z17IAwgu&cn2A4'
 CsrfProtect(app)
+Bootstrap(app)
 
 
 @app.route("/")
@@ -21,7 +23,7 @@ def manufacturerlist():
 def manufacturerPage(manufacturer_id):
     manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
     models = manufacturer.models.query.filter_by(
-        manufacturer_id=manufacturer.id)
+        manufacturer_id=manufacturer.id)  # How do we order_by here?
     return render_template("manufacturerpage.html",
                            manufacturer=manufacturer,
                            models=models)
@@ -39,7 +41,7 @@ def modelPage(manufacturer_id, model_id):
 @app.route("/<int:manufacturer_id>/edit/", methods=['GET', 'POST'])
 def editManufacturerPage(manufacturer_id):
     manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
-    form = EditForm()
+    form = ManufacturerEditForm()
     if request.method == 'GET':
         return render_template("editmanufacturerpage.html",
                                manufacturer=manufacturer,
@@ -63,7 +65,7 @@ def editManufacturerPage(manufacturer_id):
 def editModelPage(manufacturer_id, model_id):
     manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
     model = manufacturer.models.query.filter_by(id=model_id).one()
-    form = EditForm()
+    form = ModelEditForm()
     if request.method == 'GET':
         return render_template("editmodelpage.html",
                                manufacturer=manufacturer,
@@ -72,6 +74,8 @@ def editModelPage(manufacturer_id, model_id):
     elif request.method == 'POST':
         if form.validate_on_submit():
             model.name = request.form['name']
+            model.picUrl = request.form['picUrl']
+            model.description = request.form['description']
             db.session.commit()
             return redirect(url_for('modelPage',
                                     manufacturer_id=manufacturer.id,
@@ -85,8 +89,14 @@ def editModelPage(manufacturer_id, model_id):
         raise RuntimeError
 
 
-class EditForm(Form):
+class ManufacturerEditForm(Form):
     name = StringField('name', validators=[DataRequired()])
+
+
+class ModelEditForm(Form):
+    name = StringField('name', validators=[DataRequired()])
+    picUrl = StringField('picUrl')
+    description = TextAreaField('description')
 
 
 if __name__ == "__main__":
