@@ -1,16 +1,15 @@
-{% extends "base.html" %}
-{% block title -%}{{manufacturer.name}} {{model.name}}{% endblock title -%}
-{% block navbar -%}
+{% extends "base.html" %} {% block title -%}{{manufacturer.name}} {{model.name}}{% endblock title -%} {% block navbar -%}
 <li class="active"> <a href="#">{{manufacturer.name}} {{model.name}}</a> </li>
 <li><a href="{{url_for('manufacturerList')}}">Back to manufacturers</a></li>
-{% endblock navbar -%}
-{% block content -%}
+<li><a href="{{url_for('editModelPage', manufacturer_id=manufacturer.id, model_id=model.id)}}">Edit</a></li>
+<li><a href="{{url_for('deleteModelPage', manufacturer_id=manufacturer.id, model_id=model.id)}}">Delete</a></li>
+{% endblock navbar -%} {% block content -%}
 <div class="container">
-    <h1><a href="{{url_for('manufacturerPage', manufacturer_id=manufacturer.id)}}">{{manufacturer.name}}</a></h1>
-    <h3>Model name: {{model.name}}</h3>
-    <p>{{model.description}}</p>
-    <img width='400' src="{{model.picUrl}}">
-    <br><br>
-    <p><a href="{{url_for('editModelPage', manufacturer_id=manufacturer.id, model_id=model.id)}}">Edit</a></p>
+  <h1><a href="{{url_for('manufacturerPage', manufacturer_id=manufacturer.id)}}">{{manufacturer.name}}</a></h1>
+  <h3>Model name: {{model.name}}</h3>
+  <p>{{model.description}}</p>
+  <img width='400' src="{{model.picUrl}}">
+  <br>
+  <br>
 </div>
 {% endblock -%}

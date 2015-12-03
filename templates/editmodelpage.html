@@ -1,34 +1,42 @@
-{% extends "base.html" -%}
-{% block title -%}{{manufacturer.name}} {{model.name}}{% endblock title -%}
-{% block content -%}
-<div class="container">
-    <h1>Edit {{manufacturer.name}} {{model.name}}</h1>
-
-    <form method='post' action='' name='model-name'>
-        <table>
-            <tr><td><label>Model name: </label></td><td>{{ form.name(size=20) }}</td></tr>
-            <tr><td><label>Photo URL: </label></td><td>{{ form.picUrl(size=20) }}</td></tr>
-            <tr><td><label>Description: </label></td><td>{{ form.description() }}</td></tr>
-        </table>
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <ul class="flash">
-            {% for message in messages %}
-            <li>{{message}}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-        {% endwith %}
-
-        <input type="submit" value="Submit">
-    </form>
-
-    <p>
-        <a href="{{url_for('modelPage', manufacturer_id=manufacturer.id, model_id=model.id)}}">
+{% extends "base.html" -%} {% block title -%}{{manufacturer.name}} {{model.name}}{% endblock title -%} {% block navbar %}
+<li class="active"><a href="#">Editing {{manufacturer.name}} {{model.name}}</a></li>
+<li><a href="{{url_for('modelPage', manufacturer_id=manufacturer.id, model_id=model.id)}}">Back to {{manufacturer.name}} {{model.name}}</a></li>
+<li> <a href="{{url_for('modelPage', manufacturer_id=manufacturer.id, model_id=model.id)}}">
             Back to manufacturers
-        </a>
-    </p>
+        </a></li>
+{% endblock navbar %} {% block content -%}
+<div class="container">
+  <h1>Edit {{manufacturer.name}} {{model.name}}</h1>
+  <form method='post' action='' name='model-name'>
+    <table>
+      <tr>
+        <td>
+          <label>Model name: </label>
+        </td>
+        <td>{{ form.name(size=20) }}</td>
+      </tr>
+      <tr>
+        <td>
+          <label>Photo URL: </label>
+        </td>
+        <td>{{ form.picUrl(size=20) }}</td>
+      </tr>
+      <tr>
+        <td>
+          <label>Description: </label>
+        </td>
+        <td>{{ form.description() }}</td>
+      </tr>
+    </table>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" /> {% with messages = get_flashed_messages() %} {% if messages %}
+    <ul class="flash">
+      {% for message in messages %}
+      <li>{{message}}</li>
+      {% endfor %}
+    </ul>
+    {% endif %} {% endwith %}
+
+    <input type="submit" value="Submit">
+  </form>
 </div>
 {% endblock content -%}

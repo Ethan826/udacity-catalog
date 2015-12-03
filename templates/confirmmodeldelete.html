@@ -1,0 +1,9 @@
+{% extends "base.html" %} {% block navbar %}
+<li class="active"><a href="#">Deleting {{manufacturer.name}} {{model.name}}</a></li>
+<li><a href="{{url_for('manufacturerPage', manufacturer_id=manufacturer.id)}}">Back to {{manufacturer.name}}</a></li>
+{% endblock navbar %} {% block content -%}
+<h1>Caution!</h1>
+<p>Do you really want to delete {{manufacturer.name}} {{model.name}}?</p>
+<a href="{{url_for('executeDeleteModel', manufacturer_id=manufacturer.id, model_id=model.id)}}"><h2><span class="caution">Delete {{manufacturer.name}} {{model.name}}.</span></h2></a>
+<br>
+{% endblock content -%}

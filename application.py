@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_bootstrap import Bootstrap
-from database.db import Manufacturer, db
+from database.db import Manufacturer, Model, db
 from flask_wtf import Form, CsrfProtect
 from wtforms import StringField, TextAreaField
 from wtforms.validators import DataRequired
@@ -14,7 +14,7 @@ Bootstrap(app)
 
 @app.route("/")
 def manufacturerList():
-    manufacturers = Manufacturer.query.all()
+    manufacturers = Manufacturer.query.order_by(Manufacturer.name).all()
     return render_template("manufacturerlist.html",
                            manufacturers=manufacturers)
 
@@ -22,8 +22,7 @@ def manufacturerList():
 @app.route("/<int:manufacturer_id>/")
 def manufacturerPage(manufacturer_id):
     manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
-    models = manufacturer.models.query.filter_by(
-        manufacturer_id=manufacturer.id)  # How do we order_by here?
+    models = manufacturer.models.all()
     return render_template("manufacturerpage.html",
                            manufacturer=manufacturer,
                            models=models)
@@ -32,7 +31,7 @@ def manufacturerPage(manufacturer_id):
 @app.route("/<int:manufacturer_id>/<int:model_id>/")
 def modelPage(manufacturer_id, model_id):
     manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
-    model = manufacturer.models.query.filter_by(id=model_id).one()
+    model = manufacturer.models.filter_by(id=model_id).one()
     return render_template("modelpage.html",
                            manufacturer=manufacturer,
                            model=model)
@@ -64,7 +63,7 @@ def editManufacturerPage(manufacturer_id):
            methods=['GET', 'POST'])
 def editModelPage(manufacturer_id, model_id):
     manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
-    model = manufacturer.models.query.filter_by(id=model_id).one()
+    model = manufacturer.models.filter_by(id=model_id).one()
     form = ModelEditForm()
     if request.method == 'GET':
         return render_template("editmodelpage.html",
@@ -81,7 +80,7 @@ def editModelPage(manufacturer_id, model_id):
                                     manufacturer_id=manufacturer.id,
                                     model_id=model.id))
         else:
-            flash("This field may not be blank.")
+            flash("The Model Name may not be blank.")
             return redirect(url_for('editModelPage',
                                     manufacturer_id=manufacturer.id,
                                     model_id=model.id))
@@ -92,13 +91,20 @@ def editModelPage(manufacturer_id, model_id):
 @app.route("/<int:manufacturer_id>/delete/")
 def deleteManufacturerPage(manufacturer_id):
     manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
-    models = manufacturer.models.query.filter_by(
+    models = manufacturer.models.filter_by(
         manufacturer_id=manufacturer.id)  # How do we order_by here?
-    if request.method == 'GET':
-        return render_template('confirmmanufacturerdelete.html',
-                               manufacturer=manufacturer,
-                               models=models,
-                               approved=False)
+    return render_template('confirmmanufacturerdelete.html',
+                           manufacturer=manufacturer,
+                           models=models)
+
+
+@app.route("/<int:manufacturer_id>/<int:model_id>/delete/")
+def deleteModelPage(manufacturer_id, model_id):
+    manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
+    model = Model.query.filter_by(id=model_id).one()
+    return render_template('confirmmodeldelete.html',
+                           manufacturer=manufacturer,
+                           model=model)
 
 
 @app.route("/<int:manufacturer_id>/delete/execute/")
@@ -107,6 +113,16 @@ def executeDeleteManufacturer(manufacturer_id):
     db.session.delete(manufacturer)
     db.session.commit()
     return redirect(url_for('manufacturerList'))
+
+
+@app.route("/<int:manufacturer_id>/<int:model_id>/delete/execute/")
+def executeDeleteModel(manufacturer_id, model_id):
+    model = Model.query.filter_by(id=model_id).one()
+    db.session.delete(model)
+    db.session.commit()
+    return redirect(url_for('manufacturerPage',
+                            manufacturer_id=manufacturer_id,
+                            model_id=model.id))
 
 
 class ManufacturerEditForm(Form):

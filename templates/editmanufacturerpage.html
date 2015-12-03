@@ -1,30 +1,26 @@
-{% extends "base.html" -%}
-{% block title -%}{{manufacturer.name}} Models{% endblock title -%}
-{% block navbar %}
+{% extends "base.html" -%} {% block title -%}{{manufacturer.name}} Models{% endblock title -%} {% block navbar %}
 <li class="active"><a href="#">Editing {{manufacturer.name}}</a></li>
 <li><a href="{{url_for('manufacturerList')}}">Back to manufacturers</a></li>
-{% endblock navbar %}
-{% block content -%}
-    <h1>Edit {{manufacturer.name}}</h1>
+{% endblock navbar %} {% block content -%}
+<h1>Edit {{manufacturer.name}}</h1>
 
 
-    <form method='post' action='' name='manufacturer-name'>
-        <p>
-            Enter the new name:<br>
-            {{ form.name(size=20) }}<br>
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-        </p>
+<form method='post' action='' name='manufacturer-name'>
+  <p>
+    Enter the new name:
+    <br> {{ form.name(size=20) }}
+    <br>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+  </p>
 
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <ul class="flash">
-            {% for message in messages %}
-            <li>{{message}}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-        {% endwith %}
+  {% with messages = get_flashed_messages() %} {% if messages %}
+  <ul class="flash">
+    {% for message in messages %}
+    <li>{{message}}</li>
+    {% endfor %}
+  </ul>
+  {% endif %} {% endwith %}
 
-        <input type="submit" value="Submit">
-    </form>
+  <input type="submit" value="Submit">
+</form>
 {% endblock content -%}
