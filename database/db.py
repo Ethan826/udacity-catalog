@@ -10,8 +10,8 @@ class Manufacturer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
     models = db.relationship('Model',
+                             lazy="dynamic",
                              cascade="all,delete",
-                             uselist=False,
                              order_by="Model.name",
                              backref="manufacturer")
 
