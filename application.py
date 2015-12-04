@@ -1,14 +1,13 @@
 from bleach import clean
 from database.db import Manufacturer, Model, db
 from dicttoxml import dicttoxml
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, Response, session
+from flask import Flask, render_template, request, redirect, url_for, flash,\
+    jsonify, Response, session
 from flask_bootstrap import Bootstrap
 from flask_wtf import Form, CsrfProtect
 from oauth2client import client
-from os import urandom
 from wtforms import StringField, TextAreaField, SelectField
 from wtforms.validators import DataRequired
-
 
 # #############################################################################
 # App setup
@@ -22,10 +21,10 @@ app.config['WTF_CSRF_ENABLED'] = True
 CsrfProtect(app)
 Bootstrap(app)
 
-
 # #############################################################################
 # Read functions
 # #############################################################################
+
 
 @app.route("/")
 def manufacturerList():
@@ -57,7 +56,6 @@ def modelPage(manufacturer_id, model_id):
                            model=model,
                            logged_in=logged_in)
 
-
 # #############################################################################
 # Login functions
 # #############################################################################
@@ -72,6 +70,7 @@ def login():
         return redirect(url_for('newManufacturerPage'))
 
 
+# Taken from the Google OAuth documentation.
 @app.route("/login/callback/")
 def loginCallback():
     flow = client.flow_from_clientsecrets(
@@ -93,10 +92,10 @@ def logout():
     session.clear()
     return redirect(url_for('manufacturerList'))
 
-
 # #############################################################################
 # Create functions
 # #############################################################################
+
 
 @app.route("/new/", methods=['GET', 'POST'])
 def newManufacturerPage():
@@ -104,18 +103,24 @@ def newManufacturerPage():
     if not logged_in:
         return redirect(url_for('manufacturerList'))
     form = ManufacturerEditForm()
+    # Handle as a get when first going to the page.
     if request.method == 'GET':
         return render_template("newmanufacturerpage.html", form=form)
+    # When the form comes back, it's a post.
     elif request.method == 'POST':
         if form.validate_on_submit():
             manufacturer = Manufacturer(clean(request.form['name']))
             db.session.add(manufacturer)
             db.session.commit()
+            # Re-bind manufacturer after commit or else it lacks an id.
             manufacturer = Manufacturer.query.filter_by(
                 name=manufacturer.name).one()
             return redirect(url_for('manufacturerPage',
                                     manufacturer_id=manufacturer.id))
         else:
+            # If there were more validations, we would have to handle them more
+            # intelligently here rather than assuming this is the only
+            # possible error.
             flash("This field may not be blank.")
             return redirect(url_for('newManufacturerPage'))
     else:
@@ -127,7 +132,7 @@ def newModelPage(manufacturer_id):
     logged_in = True if 'credentials' in session else False
     manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
     if not logged_in:
-        redirect(url_for('manufacturerPage', manufacturer_id=manufactuerer.id))
+        redirect(url_for('manufacturerPage', manufacturer_id=manufacturer.id))
     choices = [(m.id, m.name) for m in Manufacturer.query.all()]
     form = ModelEditForm(mfg=manufacturer.id)
     form.mfg.choices = choices
@@ -137,8 +142,9 @@ def newModelPage(manufacturer_id):
                                form=form)
     elif request.method == 'POST':
         if form.validate_on_submit():
-            model = Model(clean(request.form['name']), clean(request.form[
-                          'description']), clean(request.form['picUrl']))
+            model = Model(
+                clean(request.form['name']), clean(request.form[
+                    'description']), clean(request.form['picUrl']))
             manufacturer = Manufacturer.query.filter_by(
                 id=request.form['mfg']).one()
             manufacturer.model.append(model)
@@ -154,20 +160,26 @@ def newModelPage(manufacturer_id):
     else:
         raise RuntimeError
 
-
 # #############################################################################
 # Update functions
 # #############################################################################
+
+# These are similar to the create functions, so refactoring might be in order
+# to abstract out the similarities.
+
 
 @app.route("/<int:manufacturer_id>/edit/", methods=['GET', 'POST'])
 def editManufacturerPage(manufacturer_id):
     logged_in = True if 'credentials' in session else False
     manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
     if not logged_in:
+    # This approach simply redirects the user if they manually type the URL for
+    # the edit page.
         return redirect(url_for('manufacturerPage',
                                 manufacturer_id=manufacturer.id))
     form = ManufacturerEditForm(name=manufacturer.name)
     if request.method == 'GET':
+        # Set default values.
         return render_template("editmanufacturerpage.html",
                                manufacturer=manufacturer,
                                form=form)
@@ -196,8 +208,13 @@ def editModelPage(manufacturer_id, model_id):
                                 manufacturer_id=manufacturer.id,
                                 model_id=model.id))
     choices = [(m.id, m.name) for m in Manufacturer.query.all()]
-    form = ModelEditForm(mfg=manufacturer.id, name=model.name,
-                         picUrl=model.picUrl, description=model.description)
+    form = ModelEditForm(mfg=manufacturer.id,
+                         name=model.name,
+                         picUrl=model.picUrl,
+                         description=model.description)
+    # Choices only renders once, per the documentation, so to set the default
+    # dynamically, we have to set the default when instatiating the form, then
+    # assign the choices list after instantiation or it won't render.
     form.mfg.choices = choices
 
     if request.method == 'GET':
@@ -224,17 +241,18 @@ def editModelPage(manufacturer_id, model_id):
     else:
         raise RuntimeError
 
-
 # #############################################################################
 # Delete functions
 # #############################################################################
+
 
 @app.route("/<int:manufacturer_id>/delete/")
 def deleteManufacturerPage(manufacturer_id):
     logged_in = True if 'credentials' in session else False
     manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
     if not logged_in:
-        return redirect(url_for('manufacturerPage', manufacturer_id=manufacturer.id))
+        return redirect(url_for('manufacturerPage',
+                                manufacturer_id=manufacturer.id))
     models = manufacturer.models.filter_by(
         manufacturer_id=manufacturer.id)  # How do we order_by here?
     return render_template('confirmmanufacturerdelete.html',
@@ -259,7 +277,7 @@ def deleteModelPage(manufacturer_id, model_id):
 @app.route("/<int:manufacturer_id>/delete/execute/")
 def executeDeleteManufacturer(manufacturer_id):
     logged_in = True if 'credentials' in session else False
-    if(logged_in):
+    if (logged_in):
         manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
         db.session.delete(manufacturer)
         db.session.commit()
@@ -277,10 +295,10 @@ def executeDeleteModel(manufacturer_id, model_id):
                             manufacturer_id=manufacturer_id,
                             model_id=model.id))
 
-
 # #############################################################################
 # Forms
 # #############################################################################
+
 
 class ManufacturerEditForm(Form):
     name = StringField('name', validators=[DataRequired()])
@@ -292,10 +310,10 @@ class ModelEditForm(Form):
     description = TextAreaField('description')
     mfg = SelectField('Manufacturer')
 
-
 # #############################################################################
 # API functions
 # #############################################################################
+
 
 def createSiteDict():
     manufacturers = Manufacturer.query.all()
@@ -321,11 +339,10 @@ def emitJson():
 def emitXml():
     return Response(dicttoxml(createSiteDict()), mimetype='text/xml')
 
-
 # #############################################################################
 # Main function
 # #############################################################################
 
 if __name__ == "__main__":
-    app.debug = True
+    app.debug = True  # Remove in production.
     app.run()
