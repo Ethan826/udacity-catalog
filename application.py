@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from dicttoxml import dicttoxml
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, Response
 from flask_bootstrap import Bootstrap
 from database.db import Manufacturer, Model, db
 from flask_wtf import Form, CsrfProtect
@@ -11,6 +12,10 @@ app.config['SECRET_KEY'] = 'qRdXDN##DjcWUfvE@@J#e^nlu%LpoB!qS9Y9Z17IAwgu&cn2A4'
 CsrfProtect(app)
 Bootstrap(app)
 
+
+# #############################################################################
+# Read functions
+# #############################################################################
 
 @app.route("/")
 def manufacturerList():
@@ -36,6 +41,10 @@ def modelPage(manufacturer_id, model_id):
                            manufacturer=manufacturer,
                            model=model)
 
+
+# #############################################################################
+# Create functions
+# #############################################################################
 
 @app.route("/new/", methods=['GET', 'POST'])
 def newManufacturerPage():
@@ -87,6 +96,10 @@ def newModelPage(manufacturer_id):
     else:
         raise RuntimeError
 
+
+# #############################################################################
+# Update functions
+# #############################################################################
 
 @app.route("/<int:manufacturer_id>/edit/", methods=['GET', 'POST'])
 def editManufacturerPage(manufacturer_id):
@@ -145,6 +158,10 @@ def editModelPage(manufacturer_id, model_id):
         raise RuntimeError
 
 
+# #############################################################################
+# Delete functions
+# #############################################################################
+
 @app.route("/<int:manufacturer_id>/delete/")
 def deleteManufacturerPage(manufacturer_id):
     manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
@@ -182,6 +199,10 @@ def executeDeleteModel(manufacturer_id, model_id):
                             model_id=model.id))
 
 
+# #############################################################################
+# Forms
+# #############################################################################
+
 class ManufacturerEditForm(Form):
     name = StringField('name', validators=[DataRequired()])
 
@@ -192,6 +213,39 @@ class ModelEditForm(Form):
     description = TextAreaField('description')
     mfg = SelectField('Manufacturer')
 
+
+# #############################################################################
+# API functions
+# #############################################################################
+
+def createSiteDict():
+    manufacturers = Manufacturer.query.all()
+    data = {}
+    for mfg in manufacturers:
+        models = mfg.models
+        mods = {}
+        for mod in models:
+            mods[mod.name] = {
+                "picUrl": mod.picUrl,
+                "description": mod.description
+            }
+        data[mfg.name] = mods
+    return data
+
+
+@app.route('/json/')
+def emitJson():
+    return jsonify(createSiteDict())
+
+
+@app.route('/xml/')
+def emitXml():
+    return Response(dicttoxml(createSiteDict()), mimetype='text/xml')
+
+
+# #############################################################################
+# Main function
+# #############################################################################
 
 if __name__ == "__main__":
     app.debug = True
