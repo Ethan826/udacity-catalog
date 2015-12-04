@@ -173,8 +173,8 @@ def editManufacturerPage(manufacturer_id):
     logged_in = True if 'credentials' in session else False
     manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
     if not logged_in:
-    # This approach simply redirects the user if they manually type the URL for
-    # the edit page.
+        # This approach simply redirects the user if they manually type the URL for
+        # the edit page.
         return redirect(url_for('manufacturerPage',
                                 manufacturer_id=manufacturer.id))
     form = ManufacturerEditForm(name=manufacturer.name)
