@@ -1,4 +1,4 @@
-{% extends "base.html" -%} {% block title -%}{{manufacturer.name}} {{model.name}}{% endblock title -%} {% block navbar %}
+{% extends "base.html" -%} {% block title -%}Edit {{manufacturer.name}} {{model.name}}{% endblock title -%} {% block navbar %}
 <li class="active"><a href="#">Editing {{manufacturer.name}} {{model.name}}</a></li>
 <li><a href="{{url_for('modelPage', manufacturer_id=manufacturer.id, model_id=model.id)}}">Back to {{manufacturer.name}} {{model.name}}</a></li>
 <li> <a href="{{url_for('manufacturerPage', manufacturer_id=manufacturer.id)}}">
