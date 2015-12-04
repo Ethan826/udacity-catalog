@@ -1,5 +1,28 @@
-# Udacity Catalog
+# Civil Airplane Catalog App
 
-This is the third project in Udacity's Full Stack Web Developer Nanodegree. When
-implemented, it will permit the user to select a category and see entries
-within.
+Python 3 is required.
+
+From the shell, run the following commands to start up this application:
+
+    $ git clone https://github.com/Ethan826/udacity-catalog.git
+    $ cd udacity-catalog/
+    $ virtualenv venv
+    $ source venv/bin/activate
+    $ pip3 install -r requirements.txt
+    $ cd database
+    $ python3 db.py
+    $ python3 populate_database.py
+    $ cd ..
+    $ python3 application.py
+
+Now launch your browser and navigate to `http://localhost:5000/`.
+
+You can now browse the catalog. To make changes, you must sign in through
+your Google account.
+
+There are two API endpoints: one for JSON at `http://localhost:5000/json/`
+and one for XML at `http://localhost:5000/xml/`.
+
+To exit the Python 3 virtualenv, issue
+
+    $ deactivate
