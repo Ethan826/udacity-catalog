@@ -1,0 +1,7 @@
+.DS_Store
+__pycache__/
+.vagrant
+pg_config.sh
+Vagrantfile
+*.pyc
+venv/
