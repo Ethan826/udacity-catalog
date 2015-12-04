@@ -1,4 +1,5 @@
 from dicttoxml import dicttoxml
+from bleach import clean
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, Response
 from flask_bootstrap import Bootstrap
 from database.db import Manufacturer, Model, db
@@ -53,7 +54,7 @@ def newManufacturerPage():
         return render_template("newmanufacturerpage.html", form=form)
     elif request.method == 'POST':
         if form.validate_on_submit():
-            manufacturer = Manufacturer(request.form['name'])
+            manufacturer = Manufacturer(clean(request.form['name']))
             db.session.add(manufacturer)
             db.session.commit()
             manufacturer = Manufacturer.query.filter_by(
@@ -79,8 +80,8 @@ def newModelPage(manufacturer_id):
                                form=form)
     elif request.method == 'POST':
         if form.validate_on_submit():
-            model = Model(request.form['name'], request.form[
-                          'description'], request.form['picUrl'])
+            model = Model(clean(request.form['name']), clean(request.form[
+                          'description']), clean(request.form['picUrl']))
             manufacturer = Manufacturer.query.filter_by(
                 id=request.form['mfg']).one()
             manufacturer.model.append(model)
@@ -111,7 +112,7 @@ def editManufacturerPage(manufacturer_id):
                                form=form)
     elif request.method == 'POST':
         if form.validate_on_submit():
-            manufacturer.name = request.form['name']
+            manufacturer.name = clean(request.form['name'])
             db.session.commit()
             return redirect(url_for('manufacturerPage',
                                     manufacturer_id=manufacturer.id))
@@ -140,11 +141,11 @@ def editModelPage(manufacturer_id, model_id):
                                form=form)
     elif request.method == 'POST':
         if form.validate_on_submit():
-            model.name = request.form['name']
+            model.name = clean(request.form['name'])
             model.manufacturer = Manufacturer.query.filter_by(
                 id=request.form['mfg']).one()
-            model.picUrl = request.form['picUrl']
-            model.description = request.form['description']
+            model.picUrl = clean(request.form['picUrl'])
+            model.description = clean(request.form['description'])
             db.session.commit()
             return redirect(url_for('modelPage',
                                     manufacturer_id=manufacturer.id,
