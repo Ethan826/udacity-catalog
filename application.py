@@ -1,15 +1,24 @@
-from dicttoxml import dicttoxml
 from bleach import clean
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, Response
-from flask_bootstrap import Bootstrap
 from database.db import Manufacturer, Model, db
+from dicttoxml import dicttoxml
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, Response, session
+from flask_bootstrap import Bootstrap
 from flask_wtf import Form, CsrfProtect
+from oauth2client import client
+from os import urandom
 from wtforms import StringField, TextAreaField, SelectField
 from wtforms.validators import DataRequired
 
+
+# #############################################################################
+# App setup
+# #############################################################################
+
 app = Flask(__name__)
+
+app.config['SECRET_KEY'] = 'XAZm&yg2hP#DEDnXStS2Qwt00Gy%PdG%kh*EmMbijyX4oBY^ZY'
 app.config['WTF_CSRF_ENABLED'] = True
-app.config['SECRET_KEY'] = 'qRdXDN##DjcWUfvE@@J#e^nlu%LpoB!qS9Y9Z17IAwgu&cn2A4'
+
 CsrfProtect(app)
 Bootstrap(app)
 
@@ -20,27 +29,69 @@ Bootstrap(app)
 
 @app.route("/")
 def manufacturerList():
+    logged_in = True if 'credentials' in session else False
     manufacturers = Manufacturer.query.order_by(Manufacturer.name).all()
     return render_template("manufacturerlist.html",
-                           manufacturers=manufacturers)
+                           manufacturers=manufacturers,
+                           logged_in=logged_in)
 
 
 @app.route("/<int:manufacturer_id>/")
 def manufacturerPage(manufacturer_id):
+    logged_in = True if 'credentials' in session else False
     manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
     models = manufacturer.models.all()
     return render_template("manufacturerpage.html",
                            manufacturer=manufacturer,
-                           models=models)
+                           models=models,
+                           logged_in=logged_in)
 
 
 @app.route("/<int:manufacturer_id>/<int:model_id>/")
 def modelPage(manufacturer_id, model_id):
+    logged_in = True if 'credentials' in session else False
     manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
     model = manufacturer.models.filter_by(id=model_id).one()
     return render_template("modelpage.html",
                            manufacturer=manufacturer,
-                           model=model)
+                           model=model,
+                           logged_in=logged_in)
+
+
+# #############################################################################
+# Login functions
+# #############################################################################
+
+
+@app.route("/login/")
+def login():
+    print('credentials' in session)
+    if 'credentials' not in session:
+        return redirect(url_for('loginCallback'))
+    else:
+        return redirect(url_for('newManufacturerPage'))
+
+
+@app.route("/login/callback/")
+def loginCallback():
+    flow = client.flow_from_clientsecrets(
+        'client_secrets.json',
+        scope='https://www.googleapis.com/auth/userinfo.email',
+        redirect_uri='http://localhost:5000/login/callback/')
+    if 'code' not in request.args:
+        auth_uri = flow.step1_get_authorize_url()
+        return redirect(auth_uri)
+    else:
+        auth_code = request.args.get('code')
+        credentials = flow.step2_exchange(auth_code)
+        session['credentials'] = credentials.to_json()
+        return redirect(url_for('manufacturerList'))
+
+
+@app.route("/logout/")
+def logout():
+    session.clear()
+    return redirect(url_for('manufacturerList'))
 
 
 # #############################################################################
@@ -49,6 +100,9 @@ def modelPage(manufacturer_id, model_id):
 
 @app.route("/new/", methods=['GET', 'POST'])
 def newManufacturerPage():
+    logged_in = True if 'credentials' in session else False
+    if not logged_in:
+        return redirect(url_for('manufacturerList'))
     form = ManufacturerEditForm()
     if request.method == 'GET':
         return render_template("newmanufacturerpage.html", form=form)
@@ -65,12 +119,15 @@ def newManufacturerPage():
             flash("This field may not be blank.")
             return redirect(url_for('newManufacturerPage'))
     else:
-        raise RuntimeError  # We probably can't get here because of the methods argument
+        raise RuntimeError  # In case of breaking to methods= argument
 
 
 @app.route("/<int:manufacturer_id>/new/", methods=['GET', 'POST'])
 def newModelPage(manufacturer_id):
+    logged_in = True if 'credentials' in session else False
     manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
+    if not logged_in:
+        redirect(url_for('manufacturerPage', manufacturer_id=manufactuerer.id))
     choices = [(m.id, m.name) for m in Manufacturer.query.all()]
     form = ModelEditForm(mfg=manufacturer.id)
     form.mfg.choices = choices
@@ -104,7 +161,11 @@ def newModelPage(manufacturer_id):
 
 @app.route("/<int:manufacturer_id>/edit/", methods=['GET', 'POST'])
 def editManufacturerPage(manufacturer_id):
+    logged_in = True if 'credentials' in session else False
     manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
+    if not logged_in:
+        return redirect(url_for('manufacturerPage',
+                                manufacturer_id=manufacturer.id))
     form = ManufacturerEditForm(name=manufacturer.name)
     if request.method == 'GET':
         return render_template("editmanufacturerpage.html",
@@ -127,8 +188,13 @@ def editManufacturerPage(manufacturer_id):
 @app.route("/<int:manufacturer_id>/<int:model_id>/edit/",
            methods=['GET', 'POST'])
 def editModelPage(manufacturer_id, model_id):
+    logged_in = True if 'credentials' in session else False
     manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
     model = manufacturer.models.filter_by(id=model_id).one()
+    if not logged_in:
+        return redirect(url_for('modelPage',
+                                manufacturer_id=manufacturer.id,
+                                model_id=model.id))
     choices = [(m.id, m.name) for m in Manufacturer.query.all()]
     form = ModelEditForm(mfg=manufacturer.id, name=model.name,
                          picUrl=model.picUrl, description=model.description)
@@ -165,7 +231,10 @@ def editModelPage(manufacturer_id, model_id):
 
 @app.route("/<int:manufacturer_id>/delete/")
 def deleteManufacturerPage(manufacturer_id):
+    logged_in = True if 'credentials' in session else False
     manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
+    if not logged_in:
+        return redirect(url_for('manufacturerPage', manufacturer_id=manufacturer.id))
     models = manufacturer.models.filter_by(
         manufacturer_id=manufacturer.id)  # How do we order_by here?
     return render_template('confirmmanufacturerdelete.html',
@@ -175,8 +244,13 @@ def deleteManufacturerPage(manufacturer_id):
 
 @app.route("/<int:manufacturer_id>/<int:model_id>/delete/")
 def deleteModelPage(manufacturer_id, model_id):
+    logged_in = True if 'credentials' in session else False
     manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
     model = Model.query.filter_by(id=model_id).one()
+    if not logged_in:
+        return redirect(url_for('modelPage',
+                                manufacturer_id=manufacturer.id,
+                                model_id=model.id))
     return render_template('confirmmodeldelete.html',
                            manufacturer=manufacturer,
                            model=model)
@@ -184,17 +258,21 @@ def deleteModelPage(manufacturer_id, model_id):
 
 @app.route("/<int:manufacturer_id>/delete/execute/")
 def executeDeleteManufacturer(manufacturer_id):
-    manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
-    db.session.delete(manufacturer)
-    db.session.commit()
+    logged_in = True if 'credentials' in session else False
+    if(logged_in):
+        manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
+        db.session.delete(manufacturer)
+        db.session.commit()
     return redirect(url_for('manufacturerList'))
 
 
 @app.route("/<int:manufacturer_id>/<int:model_id>/delete/execute/")
 def executeDeleteModel(manufacturer_id, model_id):
-    model = Model.query.filter_by(id=model_id).one()
-    db.session.delete(model)
-    db.session.commit()
+    logged_in = True if 'credentials' in session else False
+    if logged_in:
+        model = Model.query.filter_by(id=model_id).one()
+        db.session.delete(model)
+        db.session.commit()
     return redirect(url_for('manufacturerPage',
                             manufacturer_id=manufacturer_id,
                             model_id=model.id))

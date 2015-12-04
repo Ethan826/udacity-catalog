@@ -2,7 +2,12 @@
 {% block title -%}Civil Airplane Catalog{% endblock title -%}
 {% block navbar -%}
         <li class="active"><a href="#">Manufacturers</a></li>
+        {% if logged_in %}
         <li><a href="{{url_for('newManufacturerPage')}}">New</a></li>
+        <li><a href="{{url_for('logout')}}">Logout</a></li>
+        {% else %}
+        <li><a href="{{url_for('login')}}">Login</a></li>
+        {% endif %}
 {% endblock navbar -%}
 {% block content -%}
 <div class="container">
