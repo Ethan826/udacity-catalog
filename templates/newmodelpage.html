@@ -1,12 +1,11 @@
-{% extends "base.html" -%} {% block title -%}{{manufacturer.name}} {{model.name}}{% endblock title -%} {% block navbar %}
-<li class="active"><a href="#">Editing {{manufacturer.name}} {{model.name}}</a></li>
-<li><a href="{{url_for('modelPage', manufacturer_id=manufacturer.id, model_id=model.id)}}">Back to {{manufacturer.name}} {{model.name}}</a></li>
+{% extends "base.html" -%} {% block title -%}New {{manufacturer.name}} model{% endblock title -%} {% block navbar %}
+<li class="active"><a href="#">New {{manufacturer.name}} model</a></li>
 <li> <a href="{{url_for('manufacturerPage', manufacturer_id=manufacturer.id)}}">
-            Back to manufacturers
+            Back to {{manufacturer.name}}
         </a></li>
 {% endblock navbar %} {% block content -%}
 <div class="container">
-  <h1>Edit {{manufacturer.name}} {{model.name}}</h1>
+  <h1>New {{manufacturer.name}} model</h1>
   <form method='post' action='' name='model-name'>
     <table>
       <tr>

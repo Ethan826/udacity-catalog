@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_bootstrap import Bootstrap
 from database.db import Manufacturer, Model, db
 from flask_wtf import Form, CsrfProtect
-from wtforms import StringField, TextAreaField
+from wtforms import StringField, TextAreaField, SelectField
 from wtforms.validators import DataRequired
 
 app = Flask(__name__)
@@ -37,10 +37,61 @@ def modelPage(manufacturer_id, model_id):
                            model=model)
 
 
+@app.route("/new/", methods=['GET', 'POST'])
+def newManufacturerPage():
+    form = ManufacturerEditForm()
+    if request.method == 'GET':
+        return render_template("newmanufacturerpage.html", form=form)
+    elif request.method == 'POST':
+        if form.validate_on_submit():
+            manufacturer = Manufacturer(request.form['name'])
+            db.session.add(manufacturer)
+            db.session.commit()
+            manufacturer = Manufacturer.query.filter_by(
+                name=manufacturer.name).one()
+            return redirect(url_for('manufacturerPage',
+                                    manufacturer_id=manufacturer.id))
+        else:
+            flash("This field may not be blank.")
+            return redirect(url_for('newManufacturerPage'))
+    else:
+        raise RuntimeError  # We probably can't get here because of the methods argument
+
+
+@app.route("/<int:manufacturer_id>/new/", methods=['GET', 'POST'])
+def newModelPage(manufacturer_id):
+    manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
+    choices = [(m.id, m.name) for m in Manufacturer.query.all()]
+    form = ModelEditForm(mfg=manufacturer.id)
+    form.mfg.choices = choices
+    if request.method == 'GET':
+        return render_template("newmodelpage.html",
+                               manufacturer=manufacturer,
+                               form=form)
+    elif request.method == 'POST':
+        if form.validate_on_submit():
+            model = Model(request.form['name'], request.form[
+                          'description'], request.form['picUrl'])
+            manufacturer = Manufacturer.query.filter_by(
+                id=request.form['mfg']).one()
+            manufacturer.model.append(model)
+            db.session.commit()
+            model = Model.query.filter_by(model.name).one()
+            return redirect(url_for('modelPage',
+                                    manufacturer_id=manufacturer.id,
+                                    model_id=model.id))
+        else:
+            flash("The Model Name may not be blank.")
+            return redirect(url_for('newModelPage',
+                                    manufacturer_id=manufacturer.id))
+    else:
+        raise RuntimeError
+
+
 @app.route("/<int:manufacturer_id>/edit/", methods=['GET', 'POST'])
 def editManufacturerPage(manufacturer_id):
     manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
-    form = ManufacturerEditForm()
+    form = ManufacturerEditForm(name=manufacturer.name)
     if request.method == 'GET':
         return render_template("editmanufacturerpage.html",
                                manufacturer=manufacturer,
@@ -64,7 +115,11 @@ def editManufacturerPage(manufacturer_id):
 def editModelPage(manufacturer_id, model_id):
     manufacturer = Manufacturer.query.filter_by(id=manufacturer_id).one()
     model = manufacturer.models.filter_by(id=model_id).one()
-    form = ModelEditForm()
+    choices = [(m.id, m.name) for m in Manufacturer.query.all()]
+    form = ModelEditForm(mfg=manufacturer.id, name=model.name,
+                         picUrl=model.picUrl, description=model.description)
+    form.mfg.choices = choices
+
     if request.method == 'GET':
         return render_template("editmodelpage.html",
                                manufacturer=manufacturer,
@@ -73,6 +128,8 @@ def editModelPage(manufacturer_id, model_id):
     elif request.method == 'POST':
         if form.validate_on_submit():
             model.name = request.form['name']
+            model.manufacturer = Manufacturer.query.filter_by(
+                id=request.form['mfg']).one()
             model.picUrl = request.form['picUrl']
             model.description = request.form['description']
             db.session.commit()
@@ -133,6 +190,7 @@ class ModelEditForm(Form):
     name = StringField('name', validators=[DataRequired()])
     picUrl = StringField('picUrl')
     description = TextAreaField('description')
+    mfg = SelectField('Manufacturer')
 
 
 if __name__ == "__main__":

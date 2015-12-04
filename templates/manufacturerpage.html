@@ -3,6 +3,7 @@
 {% block navbar -%}
         <li class="active"><a href="#">{{manufacturer.name}}</a></li>
         <li><a href="{{url_for('manufacturerList')}}">Back to manufacturers</a></li>
+        <li><a href="{{url_for('newModelPage', manufacturer_id=manufacturer.id)}}">New Model</a></li>
         <li><a href="{{url_for('editManufacturerPage', manufacturer_id=manufacturer.id)}}">Edit</a></li>
         <li><a href="{{url_for('deleteManufacturerPage', manufacturer_id=manufacturer.id)}}">Delete</a></li>
 {% endblock navbar -%}
