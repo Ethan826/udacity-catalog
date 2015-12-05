@@ -147,13 +147,14 @@ def newModelPage(manufacturer_id):
                     'description']), clean(request.form['picUrl']))
             manufacturer = Manufacturer.query.filter_by(
                 id=request.form['mfg']).one()
-            manufacturer.model.append(model)
+            manufacturer.models.append(model)
             db.session.commit()
-            model = Model.query.filter_by(model.name).one()
+            model = Model.query.filter_by(name=model.name).first()
             return redirect(url_for('modelPage',
                                     manufacturer_id=manufacturer.id,
                                     model_id=model.id))
         else:
+            print(form.errors)
             flash("The Model Name may not be blank.")
             return redirect(url_for('newModelPage',
                                     manufacturer_id=manufacturer.id))
@@ -308,7 +309,7 @@ class ModelEditForm(Form):
     name = StringField('name', validators=[DataRequired()])
     picUrl = StringField('picUrl')
     description = TextAreaField('description')
-    mfg = SelectField('Manufacturer')
+    mfg = SelectField(coerce=int)
 
 # #############################################################################
 # API functions
