@@ -2,7 +2,8 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///catalog.db'
+db_conn = 'postgresql+psycopg2://catalog:udacity@localhost/catalog'
+app.config['SQLALCHEMY_DATABASE_URI'] = db_conn
 db = SQLAlchemy(app)
 
 

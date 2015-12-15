@@ -11,7 +11,7 @@ From the shell, run the following commands to start up this application:
     $ pip3 install -r requirements.txt
     $ cd database
     $ python3 db.py
-    $ python3 populate_database.py
+    $ python3 populate_db.py
     $ cd ..
     $ python3 application.py
 
