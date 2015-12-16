@@ -1,5 +1,5 @@
 from bleach import clean
-from database.db import Manufacturer, Model, db
+from catalog.database.db import Manufacturer, Model, db
 from dicttoxml import dicttoxml
 from flask import Flask, render_template, request, redirect, url_for, flash,\
     jsonify, Response, session
@@ -345,5 +345,5 @@ def emitXml():
 # #############################################################################
 
 if __name__ == "__main__":
-    app.debug = True  # Remove in production.
+    # app.debug = True  # Remove in production.
     app.run()
