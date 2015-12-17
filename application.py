@@ -74,9 +74,10 @@ def login():
 @app.route("/login/callback/")
 def loginCallback():
     flow = client.flow_from_clientsecrets(
-        'client_secrets.json',
+        '/var/www/FlaskApp/catalog/client_secrets.json',
         scope='https://www.googleapis.com/auth/userinfo.email',
-        redirect_uri='http://localhost:5000/login/callback/')
+        redirect_uri=
+        'http://ec2-52-10-193-168.us-west-2.compute.amazonaws.com/login/callback/')
     if 'code' not in request.args:
         auth_uri = flow.step1_get_authorize_url()
         return redirect(auth_uri)
