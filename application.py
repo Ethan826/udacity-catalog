@@ -15,7 +15,7 @@ from wtforms.validators import DataRequired
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = 'XAZm&yg2hP#DEDnXStS2Qwt00Gy%PdG%kh*EmMbijyX4oBY^ZY'
+app.config['SECRET_KEY'] = ''  # Add here
 app.config['WTF_CSRF_ENABLED'] = True
 
 CsrfProtect(app)
