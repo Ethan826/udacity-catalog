@@ -6,6 +6,9 @@ From the shell, run the following commands to start up this application:
 
     $ git clone https://github.com/Ethan826/udacity-catalog.git
     $ cd udacity-catalog/
+
+Edit the `catalog.py` file to update the secret key to permit Google OAuth login.
+    
     $ virtualenv venv
     $ source venv/bin/activate
     $ pip3 install -r requirements.txt
